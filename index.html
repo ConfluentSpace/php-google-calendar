@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Tools and Resources | Confluent</title>
+        <link rel="icon" href="/images/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" href="/images/favicon-192x192.png" sizes="192x192">
+        <link rel="apple-touch-icon-precomposed" href="/images/favicon-180x180.png">
+        <meta name="msapplication-TileImage" content="/images/favicon-270x270.png">
+        <meta name="msapplication-TileColor" content="#f99d33">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="These are the various spaces, tools, and supplies we have.">
+        <meta property="og:site_name" content="Confluent">
+        <meta property="og:title" content="Tools and Resources | Confluent">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="https://confluent.space/resources">
+        <meta property="og:image" content="https://confluent.space/images/pages/resources/links.jpg">
+        <meta property="og:description" content="These are the various spaces, tools, and supplies we have.">
+        <meta name="twitter:title" content="Tools and Resources | Confluent">
+        <meta name="site" content="@confluent_space">
+        <meta name="twitter:description" content="These are the various spaces, tools, and supplies we have.">
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:image" content="https://confluent.space/images/pages/resources/links.jpg">
+        <script src="/scripts/menu.js"></script>
+        <link rel="stylesheet" href="/styles/font-awesome.min.css">
+        <link rel="stylesheet" href="/styles/main.css">
+        <link rel="stylesheet" href="/styles/resources.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/0.7.23/webcomponents-lite.min.js"></script>
+        <link rel="import" href="calendarComponent.php">
+        <style>
+            h3 {
+              margin-bottom: 0;
+            }
+            h3 > a {
+              text-decoration: none;
+            }
+            h3 > a:focus {
+              border: none;
+              outline: none;
+              border-bottom: 1px solid white;
+            }
+            section.calendar {
+              margin-top: 0;
+            }
+        </style>
+        <script>
+          //Inactivity Refresh
+          (function() {
+            var REFRESH_INTERVAL_MS = 60000;
+            
+            var t;
+            window.onload = resetTimer;
+            // DOM Events
+            document.onmousemove = resetTimer;
+            document.onkeypress = resetTimer;
+            document.onclick = resetTimer;     // touchpad clicks
+            document.onscroll = resetTimer;    // scrolling with arrow keys
+        
+            function logout() {
+              window.location.href = "#events";
+              window.location.reload();
+            }
+        
+            function resetTimer() {
+                clearTimeout(t);
+                t = setTimeout(logout, REFRESH_INTERVAL_MS)
+            }
+          })();
+        </script>
+    </head>
+    <body>
+        <header>
+            <a href="/"><h1>Confluent</h1></a>
+            <nav>
+                <ul id="menu">
+                    <li id="menu-toggle" class="smallscreens"><i class="fa fa-bars"><span>Menu</span></i></li>
+                    <li><a href="/about-us">About</a></li>
+                    <li class="smallscreens subpage"><a href="/photolog">Photo Log</a></li>
+                    <li><a href="/resources">Resources</a></li>
+                    <li class="smallscreens subpage"><a href="/resources/laser-cutter">Laser Cutter</a></li>
+                    <li class="smallscreens subpage"><a href="/resources/3d-printers">3D Printers</a></li>
+                    <li><a href="/calendar">Events</a></li>
+                    <li><a href="https://store.confluent.space">Store</a></li>
+                </ul>
+            </nav>
+            <h2><span>Imagine</span> <span>Make</span> <span>Learn</span></h2>
+        </header>
+        <section class="calendar-header">
+            <h3><a name="events" href="#events">Events Calendar</a></h3>
+            <!--
+            <h4>Subscribe to the Monthly Newsletter</h4>
+            Want events to come to your inbox? <a href="https://store.confluent.space/monthly-newsletter-signup/">Subscribe to our Monthly Newsletter!</a>
+            -->
+        </section>
+        <section class="calendar">
+          <confluent-calendar></confluent-calendar>
+        </section>
+        <footer class="business-info">
+            <div>
+                <address>
+                    Confluent<br>
+                    285 Williams Blvd<br>
+                    Richland, WA 99354<br>
+                </address>
+                <dl>
+                    <dt><i class="label fa fa-fw"><span>Hours:</span></i></dt>
+                    <dd><strong>Wed-Fri: 5-8pm, Sat-Sun: 12-8pm</strong></dd>
+                    <dt><i class="label fa fa-fw fa-phone"><span>Phone:</span></i></dt>
+                    <dd>(509) 371-9267</dd>
+                    <dt><i class="label fa fa-fw fa-envelope"><span>Email:</span></i></dt>
+                    <dd><a href="mailto:confluent.space@gmail.com">confluent.space@gmail.com</a></dd>
+                </dl>
+                <ul>
+                    <li><a href="https://www.facebook.com/ConfluentSpace"><i class="fa fa-facebook"><span>Facebook</span></i></a></li>
+                    <li><a href="https://twitter.com/confluent_space"><i class="fa fa-twitter"><span>Twitter</span></i></a></li>
+                    <li><a href="https://www.instagram.com/confluent_space/"><i class="fa fa-instagram"><span>Instagram</span></i></a></li>
+                    <li><a href="https://www.flickr.com/photos/confluent_space/"><i class="fa fa-flickr"><span>Flickr</span></i></a></li>
+                </ul>
+            </div>
+        </footer>
+    </body>
+</html>
