@@ -10,7 +10,6 @@ define('CLIENT_SECRET_PATH', __DIR__ . '/.google-secret.json');
 define('SCOPES', Google_Service_Calendar::CALENDAR_READONLY);
 define('CALENDAR', $CALENDAR);
 
-
 /**
  * Returns an authorized API client.
  * @return Google_Client the authorized client object
@@ -94,12 +93,24 @@ $events = $service->events->listEvents(CALENDAR, $optParams)->getItems();
       margin-top: 0;
     }
 
+    .event .description > p:last-child {
+      margin-bottom: 0;
+    }
+
     .event .details {
       display: none;
     }
     
     .event .location {
       float: right;
+    }
+
+    .event .preview {
+      float: right;
+    }
+
+    .event .preview img {
+      max-width: 200px;
     }
     
     .event .price {
@@ -210,11 +221,25 @@ if (count($events) == 0) {
     $descshort = $descshort[0];
     $descshort = substr($descshort, 0, 200);
     if( strlen($descshort) != strlen($event->description) ) {
+      if ( preg_match('/<[[:alpha:]]+[^>]*$/', $descshort) ) {
+        $descshort = preg_replace("/<[[:alpha:]]+[^>]*$/","",$descshort);
+      } else if ( preg_match('/<[[:alpha:]]>[^<]*(?:<\/[[:alpha:]]+)?$/', $descshort) ) {
+        $descshort = preg_replace("/<([[:alpha:]]+)( ?[[:alpha:]]?+)>([^<]+)(?:<\/[[:alpha:]]+)?$/","<$1$2>$3</$1>",$descshort);
+      }
       $descshort = preg_replace("~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~",'<a href="$0">$0</a>',$descshort);
       $descshort .= "…";
       $hasmore = TRUE;
     } else {
       $descshort = preg_replace("~[[:alpha:]]+://[^<>[:space:]]+[[:alnum:]/]~",'<a href="$0">$0</a>',$descshort);
+    }
+
+    $img = "";
+    $attachments = $event->getAttachments();
+    if( $attachments && count($attachments) > 0 ) {
+      foreach ( $attachments as $attachment ) {
+          $img = "https://drive.google.com/uc?id=".$attachment->fileId;
+        break;
+      }
     }
     
     $cssClass =
@@ -241,9 +266,9 @@ if (count($events) == 0) {
     <?php if($event->location || $hasmore) { ?>
     <span class="more" title="Click to show more details" onClick="if (event.target.previousElementSibling.style.display) { event.target.previousElementSibling.style.display = ''; event.target.nextElementSibling.style.display = ''; } else { event.target.previousElementSibling.style.display = 'none'; event.target.nextElementSibling.style.display = 'block'; }">&#8943;</span>
     <div class="details">
-      <?php /*if($event->location) { ?>
-      <div class="location"><img title="<?=$event->location?>" src="https://maps.googleapis.com/maps/api/staticmap?style=feature:poi|element:labels.text|visibility:off&markers=color:blue%7C<?=urlencode($event->location)?>&zoom=17&size=200x100&key=<?=$MAPS_BROWSER_KEY ?>" /></div>
-      <?php }*/ ?>
+      <?php if($img) { ?>
+      <div class="preview"><img alt="<?=$event->summary.' preview image'?>" src="<?=$img?>"></div>
+      <?php } ?>
       <div class="description"><?=$event->description?></div>
     </div>
     <?php } ?>
