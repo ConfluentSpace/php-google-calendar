@@ -196,7 +196,7 @@ if (count($events) == 0) {
     $isCancelled = $event->status == "cancelled";
     
     preg_match('/https:\/\/store.confluent.space\/([^\s<])*/', $event->description, $matches);
-    $storeLink = $matches[0];
+    $storeLink = preg_split('/">/', $matches[0], -1, PREG_SPLIT_NO_EMPTY)[0];
     
     preg_match('/((Free)|(\$\S+)) [^\x0a\x0d<>]* Members[^\x0a\x0d<>]* ((Free)|(\$\S+)) for non-members/i', $event->description, $matches);
     $price = $matches[0];
@@ -241,9 +241,9 @@ if (count($events) == 0) {
     <?php if($event->location || $hasmore) { ?>
     <span class="more" title="Click to show more details" onClick="if (event.target.previousElementSibling.style.display) { event.target.previousElementSibling.style.display = ''; event.target.nextElementSibling.style.display = ''; } else { event.target.previousElementSibling.style.display = 'none'; event.target.nextElementSibling.style.display = 'block'; }">&#8943;</span>
     <div class="details">
-      <?php if($event->location) { ?>
+      <?php /*if($event->location) { ?>
       <div class="location"><img title="<?=$event->location?>" src="https://maps.googleapis.com/maps/api/staticmap?style=feature:poi|element:labels.text|visibility:off&markers=color:blue%7C<?=urlencode($event->location)?>&zoom=17&size=200x100&key=<?=$MAPS_BROWSER_KEY ?>" /></div>
-      <?php } ?>
+      <?php }*/ ?>
       <div class="description"><?=$event->description?></div>
     </div>
     <?php } ?>
