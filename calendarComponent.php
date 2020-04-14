@@ -66,7 +66,7 @@ $events = $service->events->listEvents(CALENDAR, $optParams)->getItems();
       color: #D0722C;
     }
     
-    .event .register {
+    .event .register, .event .online {
       float: right;
       font-size: 1.25em;
       padding: .3em 1em;
@@ -74,6 +74,12 @@ $events = $service->events->listEvents(CALENDAR, $optParams)->getItems();
       color: #1e4897;
       text-decoration: none;
       border-radius: 5px;
+    }
+
+    .event .online {
+      font-family: inherit;
+      border: none;
+      cursor: pointer;
     }
     
     .event .when {
@@ -186,6 +192,31 @@ $events = $service->events->listEvents(CALENDAR, $optParams)->getItems();
       cursor: pointer;
       margin: 1em auto;
     }
+
+    .event .meeting {
+      float: right;
+      padding-left: 1em;
+      margin-left: 1em;
+      margin-bottom: 1em;
+      border-left: 2px solid #f99d33;
+    }
+
+    .event .meeting h5 {
+      margin: 0;
+      margin-bottom: .5em;
+      font-size: 1em;
+    }
+
+    .event .meeting h6 {
+      margin: 0;
+      margin-top: .5em;
+      font-size: 1em;
+      font-weight: normal;
+    }
+
+    .event .meeting a {
+      color: inherit;
+    }
   </style>
   <div>
 <?php
@@ -208,6 +239,10 @@ if (count($events) == 0) {
     
     preg_match('/https:\/\/store.confluent.space\/([^\s<])*/', $event->description, $matches);
     $storeLink = preg_split('/">/', $matches[0], -1, PREG_SPLIT_NO_EMPTY)[0];
+
+    if ($storeLink == 'https://store.confluent.space/product/awesome-donation/' ) {
+      $storeLink = '';
+    }
     
     preg_match('/((Free)|(\$\S+)) [^\x0a\x0d<>]* Members[^\x0a\x0d<>]* ((Free)|(\$\S+)) for non-members/i', $event->description, $matches);
     $price = $matches[0];
@@ -241,14 +276,31 @@ if (count($events) == 0) {
         break;
       }
     }
+
+    $meetingUrl = "";
+    $meetingPhone = "";
+    $conference = $event->conferenceData;
+    if( $conference ) {
+      $type = $conference["conferenceSolution"]["key"]["type"];
+      if( $type == "hangoutsMeet" ) {
+        foreach ( $conference["entryPoints"] as $entryPoint ) {
+          $type = $entryPoint["entryPointType"];
+          if( $type == "video" ) {
+            $meetingUrl = $entryPoint;
+          } else if ( $type == "phone" ) {
+            $meetingPhone = $entryPoint;
+          }
+        }
+        $hasmore = TRUE;
+      }
+    }
     
     $cssClass =
-      ($isNew?"new":"") +
-      ($isUpdated?"updated":"") +
-      ($isCancelled?"cancelled":"") +
+      ($isNew?"new ":"") .
+      ($isUpdated?"updated ":"") .
+      ($isCancelled?"cancelled":"") .
       "";
 ?>
-
 <div class="event <?=$cssClass?>">
   <div class="calendar-date">
     <div class="month"><?=(new DateTime($start))->format("M")?></div>
@@ -257,17 +309,31 @@ if (count($events) == 0) {
   </div>
   <div class="event-content">
     <?php if ($storeLink) { ?><a class="register" href="<?=$storeLink?>">Register</a><?php } ?>
+    <?php if ($meetingUrl || $meetingPhone) { ?><button class="online" onClick="event.target.parentNode.querySelector('.shortdesc').style.display = 'none'; event.target.parentNode.querySelector('.details').style.display = 'block';">Online Details</button><?php } ?>
     <h4 class="summary"><a href="<?=$event->htmlLink?>"><?=$event->summary?></a></h4>
     <div class="when"><?=(new DateTime($start))->format("g:i a")?> - <?=(new DateTime($end))->format("g:i a")?></div>
     <div class="price"><?=$price?></div>
     <?php if($hasdesc) { ?>
     <div class="shortdesc"><?=$descshort?></div>
     <?php } ?>
-    <?php if($event->location || $hasmore) { ?>
+    <?php if($event->location || $hasmore || $meetingUrl || $meetingPhone) { ?>
     <span class="more" title="Click to show more details" onClick="if (event.target.previousElementSibling.style.display) { event.target.previousElementSibling.style.display = ''; event.target.nextElementSibling.style.display = ''; } else { event.target.previousElementSibling.style.display = 'none'; event.target.nextElementSibling.style.display = 'block'; }">&#8943;</span>
     <div class="details">
       <?php if($img) { ?>
       <div class="preview"><img alt="<?=$event->summary.' preview image'?>" src="<?=$img?>"></div>
+      <?php } ?>
+      <?php if($meetingUrl || $meetingPhone) { ?>
+      <div class="meeting">
+        <h5>Meeting Info</h5>
+        <?php if($meetingUrl) { ?>
+        <h6>Join Us Online:</h6>
+        <div><i class="fa fa-fw fa-desktop"></i> <a href="<?=$meetingUrl['uri']?>"><?=$meetingUrl["label"]?></a></div>
+        <?php } ?>
+        <?php if($meetingPhone) { ?>
+        <h6>Call In (Voice Only):</h6>
+        <div><i class="fa fa-fw fa-phone"></i> <a href="<?=$meetingPhone['uri']?>"><?=$meetingPhone["label"]?></a> PIN: <?=trim(chunk_split($meetingPhone["pin"], 3, " "))?>#</div>
+        <?php } ?>
+      </div>
       <?php } ?>
       <div class="description"><?=$event->description?></div>
     </div>
